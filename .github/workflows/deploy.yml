@@ -1,7 +1,6 @@
 name: Deploy to AWS EC2
 
 on:
-
  push:
    branches:
      - main
@@ -38,5 +37,4 @@ jobs:
             git pull origin main
             docker-compose down
             docker-compose up -d --build
-
           EOF
