@@ -1,0 +1,42 @@
+name: Deploy to AWS EC2
+
+on:
+
+ push:
+   branches:
+     - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          echo "${{ secrets.AWS_SSH_KEY }}" | tr -d '\r' > private_key.pem
+          chmod 600 private_key.pem
+
+      - name: Debug SSH Key
+        run: |
+          echo "Checking if private key exists..."
+          ls -l private_key.pem
+          echo "First 5 lines of the private key:"
+          head -n 5 private_key.pem
+
+      - name: Debug Secrets
+        run: |
+          echo "AWS_EC2_USER: '${{ secrets.AWS_EC2_USER }}'"
+          echo "AWS_EC2_HOST: '${{ secrets.AWS_EC2_HOST }}'"
+
+      - name: Deploy to AWS EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.AWS_EC2_HOST }} << 'EOF'
+            cd /home/ubuntu/docker-lepp || git clone https://github.com/hakeem-ops/docker-lepp.git /home/ubuntu/docker-lepp/docker-lepp
+            git pull origin main
+            docker-compose down
+            docker-compose up -d --build
+
+          EOF
