@@ -33,7 +33,7 @@ jobs:
       - name: Deploy to AWS EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.AWS_EC2_HOST }} << 'EOF'
-            cd /home/ubuntu/docker-lepp || git clone https://github.com/hakeem-ops/docker-lepp.git /home/ubuntu/docker-lepp/docker-lepp
+            cd /home/ubuntu/docker-lepp/docker-lepp || git clone https://github.com/hakeem-ops/docker-lepp.git /home/ubuntu/docker-lepp/docker-lepp
             git pull origin main
             docker-compose down
             docker-compose up -d --build
